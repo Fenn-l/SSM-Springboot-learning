@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--注入dao-->
+    <bean id="daoImp" class="com.ape.dao.UserDaoImp"></bean>
+
+    <!--注入service-->
+    <bean id="serviceImp" class="com.ape.service.UserServiceImp">
+        <property name="dao" ref="daoImp"></property>
+    </bean>
+
+    <!--注入controller-->
+    <bean id="controllerImp" class="com.ape.controller.UserControllerImp">
+        <property name="service" ref="serviceImp"></property>
+    </bean>
+
+</beans>

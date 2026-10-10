@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--注入dao-->
+    <bean id="daoImp" class="com.ape.dao.UserDaoImp"></bean>
+
+    <!--注入service-->
+    <bean id="serviceImp" class="com.ape.service.UserServiceImp">
+        <constructor-arg name="dao" ref="daoImp"></constructor-arg>
+    </bean>
+
+    <!--注入controller-->
+    <bean id="controllerImp" class="com.ape.controller.UserControllerImp">
+        <constructor-arg name="service" ref="serviceImp"></constructor-arg>
+    </bean>
+
+
+    <!--name属性-->
+    <bean class="com.ape.bean.Student" id="student1">
+        <constructor-arg name="stuName" value="aa"></constructor-arg>
+        <constructor-arg name="stuAge" value="10"></constructor-arg>
+        <constructor-arg name="stuScore" value="10"></constructor-arg>
+    </bean>
+
+    <!--index属性-->
+    <bean class="com.ape.bean.Student" id="student2">
+        <constructor-arg index="0" value="aa"></constructor-arg>
+        <constructor-arg index="1" value="10"></constructor-arg>
+        <constructor-arg index="2" value="10"></constructor-arg>
+    </bean>
+
+    <!--type属性-->
+    <bean class="com.ape.bean.Student" id="student3">
+        <constructor-arg type="java.lang.String" value="aa"></constructor-arg>
+        <constructor-arg type="int" value="10"></constructor-arg>
+        <constructor-arg type="double" value="10"></constructor-arg>
+    </bean>
+</beans>

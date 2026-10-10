@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--无参创建对象-->
+<!--    <bean class="com.ape.bean.Student" id="student"></bean>-->
+
+    <!--通过工厂创建对象-->
+<!--    <bean class="com.ape.bean.Teacher" id="teacher" factory-bean="teacherFactory" factory-method="createTeacher"></bean>-->
+
+<!--    <bean class="com.ape.factory.TeacherFactory" id="teacherFactory"></bean>-->
+
+    <!--通过静态工厂创建对象-->
+<!--    <bean id="school" class="com.ape.factory.SchoolFactory" factory-method="createSchool"></bean>-->
+
+
+<!--    <bean class="com.ape.bean.Student" id="student" scope="prototype"></bean>-->
+
+    <bean id="dog" class="com.ape.bean.Dog" init-method="initMethod" destroy-method="destoryMethod"></bean>
+</beans>
