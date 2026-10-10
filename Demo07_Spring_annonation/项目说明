@@ -1,0 +1,77 @@
+spring的配置
+        1.spring2.5前==xml
+        2.spring2.5后==xml+annotation
+        3.spring3.0后==annotation+JavaConfig配置类
+
+    spring2.5后=xml+annotation
+        目的优化一下代码：
+            <bean id="" class="" init-method="" destroy-method="" scope="" autowire="">
+                <property></property>
+                <constructor-arg></constructor-arg>
+            </bean>
+
+         注解：
+            1.注入类
+                替换：<bean id="" class=""></bean>
+                位置：类
+                语法:
+                    @Component
+                        eg：Class User{}
+                            <bean id="user" class="com.apesource.包.User"></bean>
+                                                ||等价于||
+                            @Component
+                            Class User{}
+                        语法：@Component(value="注入容器中的id，如果省略id为类名且首字母小写，value属性名称可以省略")
+                        注意：
+                        <context:component-scan base-package=""></context:component-scan>
+                        含义：扫描所有被@Component注解所修饰的类，注入容器
+
+                    @Repository=====>注入数据访问层
+                    @Service========>注入业务层
+                    @Controller=====>注入控制层
+                    以上三个注解与@Component功能语法一致
+
+            2.注入数据
+                @Value
+                    含义：注入基本数据
+                    替换：<property></property>
+                    修饰：成员变量
+                    语法：@Value("数据内容")
+                         @Value("${动态获取}")
+                    注意：<context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+
+                @Autowired
+                    语法：@Autowired(required = "true-默认、false、是否必须进行装配")
+                    修饰：成员变量
+                    含义：按照“类型装配”
+                    注意：
+                        1.默认是按照类型装配
+                        2.若容器中有一个类型可以与之匹配则装配成功,若没有一个类型可以匹配则报错
+                            NoSuchBeanDefinitionException
+                        3.若容器中有多个类型可以与之匹配，则自动切换为按照名称装配，若名称没有对应，则报错
+                            NoUniqueBeanDefinitionException
+
+            3.其他注解
+                    @Primary
+                        含义：首选项，当类型冲突的情况下，此注解修饰的类被列为首选（备胎扶正）
+                        修饰：类
+                        注意：不能单独使用，必须与@Component....联合使用
+                    @Qualifier(value="名称")
+                        含义：按照名称装配
+                        修饰：成员变量
+                        注意：不能单独使用，必须与@Autowired联合使用
+                    @Resource(name="名称")
+                        含义：按照名称装配
+                        修饰：成员变量
+                        注意：单独使用
+                    @Scope
+                        含义：配置类的作用域
+                        修饰：类
+                        注意：不能单独使用，必须与@Component....联合使用
+                            @Scope("prototype")
+                            @Scope("singleton")
+                            @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+                            @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+
+                    @PostConstruct:初始化，修饰方法 替换：init-method属性
+                    @PreDestroy:销毁,修饰方法 替换：destory-method
