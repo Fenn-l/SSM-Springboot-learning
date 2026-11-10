@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--注入连接池 数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/demo_db?serverTimezone=GMT"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="zxcv1234"></property>
+    </bean>
+
+    <!--注入queryRunner-->
+    <bean id="queryRunner" class="org.apache.commons.dbutils.QueryRunner">
+        <constructor-arg name="ds" ref="dataSource"></constructor-arg>
+    </bean>
+
+    <context:component-scan base-package="com.ape"></context:component-scan>
+
+<!--    &lt;!&ndash;注入dao&ndash;&gt;-->
+<!--    <bean id="daoImp" class="com.ape.dao.DaoImp">-->
+<!--        <property name="queryRunner" ref="queryRunner"></property>-->
+<!--    </bean>-->
+
+<!--    &lt;!&ndash;注入service&ndash;&gt;-->
+<!--    <bean id="serviceImp" class="com.ape.service.ServiceImp">-->
+<!--        <property name="dao" ref="daoImp"></property>-->
+<!--    </bean>-->
+
+
+<!--    &lt;!&ndash;注入controller&ndash;&gt;-->
+<!--    <bean id="controllerImp" class="com.ape.controller.ControllerImp">-->
+<!--        <property name="service" ref="serviceImp"></property>-->
+<!--    </bean>-->
+</beans>
