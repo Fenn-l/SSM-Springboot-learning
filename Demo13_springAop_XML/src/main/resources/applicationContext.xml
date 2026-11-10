@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="accountService" class="com.ape.service.AccountServiceImp"></bean>
+    <bean id="logger" class="com.ape.util.Logger"></bean>
+    <!--配置AOP-->
+    <aop:config>
+        <!--配置切面 -->
+        <aop:aspect id="aopAspect" ref="logger">
+            <!--切点-->
+            <aop:pointcut id="dian" expression="execution(public * com.ape.service.*.*(..))"/>
+
+
+            <!--前置通知-->
+            <aop:before method="beforeMethod" pointcut-ref="dian"></aop:before>
+            <!--            &lt;!&ndash;返回通知&ndash;&gt;-->
+            <!--            <aop:after-returning method="afterReturnMethod" pointcut-ref="dian"></aop:after-returning>-->
+            <!--            &lt;!&ndash;异常通知&ndash;&gt;-->
+            <!--            <aop:after-throwing method="throwsMethod" pointcut-ref="dian"></aop:after-throwing>-->
+            <!--            &lt;!&ndash;后置通知&ndash;&gt;-->
+            <!--            <aop:after method="afterMethod" pointcut-ref="dian"></aop:after>-->
+            <!--            环绕通知-->
+            <!--            <aop:around method="arroundMethod" pointcut-ref="dian"></aop:around>-->
+
+        </aop:aspect>
+    </aop:config>
+</beans>

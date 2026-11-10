@@ -1,0 +1,20 @@
+Spring对于bean的管理
+一.bean的创建
+    1.bean的无参构造方法进行创建（默认）
+    2.通过指定工厂方法进行bean对象的创建
+    3.通过指定静态工厂方法进行bean对象的创建
+
+二.bean的作用域
+    含义：bean对象的创建方式
+    <bean scope="属性值">
+    属性值：
+        singleton====》单例
+        prototype====》多例
+        request======》一个请求创建一个javaBean
+        session======》一个会话创建一个javaBean
+
+三.bean的生命周期
+    实例化
+    初始化
+    操作使用
+    销毁

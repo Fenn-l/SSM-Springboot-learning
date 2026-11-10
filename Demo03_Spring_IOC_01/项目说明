@@ -1,0 +1,32 @@
+Spring两大核心思想：
+    SpringIOC控制反转/DI依赖注入
+    SpringAOP面向切面编程
+
+SpringIOC控制反转
+        控制:JavaBean的控制权（创建 销毁....）
+        反转:JavaBean的控制权原先调用者维护现在反转给spring容器管理
+        作用：搭建SpringIOC容器将所有的JavaBean存放在容器中 未来由容器进行实例化，“解耦”
+
+Spring框架环境搭建:
+        1.添加坐标
+        2.创建主配置文件
+
+SpringIOC初始使用步骤
+        1.javaBean类注入springIOC容器
+          <bean id="唯一标识" class="注入类的完全限定名称"></bean>
+        2.加载springIOC容器获取javaBean对象
+            2.1.获取ApplicationContext
+            2.2.调用ApplicationContext的 return object getBean("id");
+
+            Demo2                           Demo3
+            beans.properties                beans.xml
+            key=value                       id=class
+            BeansFactory                    ApplicationContext
+            Object getBean(key)             Obejct getBean(id)
+
+  ClassPathXmlApplicationContext=====》通过相对路径加载主配置文件
+  FileSystemXmlApplicationContext====》通过绝对路径加载主配置文件
+  AnnotationConfigApplicationContext=》通过加载配置类获取spring容器对象
+
+  ApplicationContext（子）
+  BeanFactory（父）

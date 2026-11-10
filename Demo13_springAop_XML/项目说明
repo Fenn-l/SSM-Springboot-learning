@@ -1,0 +1,68 @@
+
+AOP 是 OOP 的延续，是软件开发中的一个热点，也是Spring框架中的一个重要内容，是函数式编程的一种衍
+生范型。利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序
+的可重用性，同时提高了开发的效率。
+
+作用：
+1.事务处理
+2.日志管理
+3.权限控制
+
+Spring AOP 基于动态代理实现：
+  ○ 如果被代理的对象，已经实现某个接口，则 Spring AOP 会使用 JDK Proxy（反射），基于接口的方式，创建代理对象（JDK动态代理的核心是InvocationHandler接口和Proxy类）；
+  ○ 如果被代理的对象，没有实现某个接口，就无法使用 JDK Proxy 去进行代理了，这时候 Spring AOP 会使用 Cglib，基于继承的方式，生成一个被代理对象的子类来作为代理（Cglib动态代理的核心是MethodInterceptor接口和Enhancer类）;
+
+AOP通知
+  AOP将抽取出来的共性功能称为通知;通知类型:以通知在上下文中的具体位置作为划分
+  解释：通知就是需要增强的方法内容以及执行位置的结合
+  前置通知（Before）
+  返回通知（After-returning）
+  异常通知（After-throwing）
+  后置通知（After）
+  环绕通知（Around）
+
+AOP连接点(Join point)
+    AOP将所有的方法都视为连接点，不管是接口里面的抽象方法,还是实现类里面的重写方法，都是连接点
+    解释：具备添加通知能力的方法位置，就是连接点，也就是所有类的所有方法
+
+AOP切点(Pointcut)
+    AOP将可能被抽取共性功能的方法称为切入点。切入点是连接点的子集
+    解释：成功添加了通知的方法位置，就是切点
+
+AOP目标对象(Target): 就是挖掉功能的方法对应的类生的对象，这种对象是无法直接完成最终工作的
+    解释：被代理对象，就是目标对象
+
+AOP织入(Weaving):就是将挖掉的功能回填的动态过程
+    解释：将通知添加到切点的过程ing,就是织入
+
+AOP切面:切点+通知
+
+SpringAOP+AspectJ实现步骤：
+1.坐标
+2.配置
+
+
+切点表达式配置语法：
+execution(修饰符 返回值 包名称.类名称.方法名称(参数列表))
+eg:
+    execution(public void com.apesource.service.ServiceImp.findAll())
+1.修饰符可以省略代表任意
+    execution(返回值 包名称.类名称.方法名称(参数列表))
+2.返回值可以使用“*”代表任意
+    execution(* 包名称.类名称.方法名称(参数列表))
+3.包名可以使用“*”代表任意名称
+    execution(* *.*.*.类名称.方法名称(参数列表))
+    eg:execution(void *.*.*.ServiceImp.findAll())
+4.包名可以使用“..”代表任意个数
+    execution(* *...类名称.方法名称(参数列表))
+    eg:execution(void *..ServiceImp.findAll())
+5.类名与方法名可以使用“*”代表任意
+    execution(* *...*.*(参数列表))
+6.参数列表可以使用".."代表任意个数任意类型
+    execution(* *...*.*(..))
+    如果有参数
+        int======>int
+        String===>java.lang.String
+
+
+
