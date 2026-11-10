@@ -1,0 +1,151 @@
+springboot_mybatis —— MyBatis 注解方式练习工程
+================================================================
+
+定位
+----------------------------------------------------------------
+纯注解方式（Annotation）的 MyBatis 练习工程，不是完整应用。
+没有 Service 层、没有 Controller 层、没有 spring-boot-starter-web。
+
+与姊妹工程 springboot_data_mybatis_04 的分工：
+    springboot_data_mybatis_04  →  XML 映射方式，练动态 SQL 标签
+                                  <if> <where> <set> <trim>
+                                  <choose> <foreach>
+    springboot_mybatis（本工程） →  注解映射方式，同一个动态 SQL 需求
+                                  改用 @SelectProvider 手写 Java 拼字符串
+
+教学价值：对比两种方式后你会发现——动态 SQL 在注解方式下只能靠
+字符串拼接，非常丑陋。这是注解方式的硬伤，也是真实项目仍以 XML
+为主的原因。EmpSql.java 就是这个结论的最佳例证。
+
+
+技术栈
+----------------------------------------------------------------
+JDK                17
+Spring Boot        3.0.2
+MyBatis Starter    3.0.0（mybatis-spring-boot-starter）
+MySQL              mysql-connector-j（版本由 Boot BOM 管理）
+Lombok             编译期生成 getter/setter
+构建               Maven（IDEA 内置 Maven，本机 mvn 命令不可用）
+
+
+目录结构
+----------------------------------------------------------------
+src/main/java/com/ape/springboot_mybatis/
+├── SpringbootMybatisApplication.java   启动类
+├── dao/                                DAO 层（MyBatis 注解方式）
+│   ├── EmpDao.java                     emp 表 CRUD + @Results复用 + 动态SQL
+│   ├── EmpSql.java                     @SelectProvider 依赖的SQL拼接类
+│   ├── UserDao.java                    user 表，含 @Many 一对多装配
+│   └── AccountDao.java                 account 表，含 @One 一对一装配
+└── pojo/                               实体类
+    ├── Emp.java                        Lombok @Data
+    ├── User.java                       Lombok @Data，含 List<Account>
+    └── Account.java                    Lombok @Data，含 User
+
+src/main/resources/
+└── application.properties              数据源 + MyBatis 配置
+
+sql/
+└── init.sql                            建库建表 + 测试数据（需手动执行）
+
+src/test/java/
+└── SpringbootMybatisApplicationTests   10个测试方法，覆盖全部DAO
+
+
+数据库表结构
+----------------------------------------------------------------
+emp表（单表，对应 EmpDao）
+    eid      INT  主键自增
+    ename    VARCHAR(50)
+    egender  VARCHAR(10)
+    esalary  INT
+
+user表（对应 UserDao）
+    userid        INT  主键自增
+    username      VARCHAR(50)
+    usersex       VARCHAR(10)
+    useraddress   VARCHAR(100)
+    userbirthday  DATE
+
+account表（对应 AccountDao）
+    aid      INT     主键自增
+    auserid  INT     所属用户编号，索引 idx_account_auserid
+    amoney   DOUBLE  余额
+
+关系：user (1) ←→ account (N)，一个用户有多个账户。
+
+
+如何运行
+----------------------------------------------------------------
+状态：2026-10-08 已验证跑通 —— mvn test 9 个测试全绿
+    （Tests run: 9, Failures: 0, Errors: 0）
+
+第1步  执行建表脚本
+    已执行完毕。三张表数据：emp 5 条 / user 4 条 / account 5 条
+    库名是 my_db（不是 mydb），与 application.properties 一致。
+    需要重建时：mysql -u root -p < sql/init.sql
+
+    ⚠️ 手敲 SQL 时注意：MySQL 的行注释必须「-- + 空格」。
+       写成 --外键 会被当成语句的一部分，直接报 1064 语法错误。
+       本工程的 init.sql 里注释都带空格，可直接整份执行。
+
+第2步  核对数据库配置（当前值已确认可用）
+    spring.datasource.url=jdbc:mysql://localhost:3306/my_db
+    spring.datasource.username=root
+    spring.datasource.password=你的密码
+
+第3步  运行测试
+    IDEA 中右键 SpringbootMybatisApplicationTests → Run
+    控制台会打印 MyBatis 执行的 SQL（已开启 log-impl）
+
+    命令行方式（本机 mvn 在 Git Bash 下不可用，见文末坑说明）：
+      cmd 里跑 set JAVA_HOME=C:\Program Files\Java\jdk-21.0.11
+                C:\apache-maven-3.9.11\bin\mvn.cmd test
+    控制台会打印 MyBatis 执行的 SQL（已开启 log-impl）
+
+
+三种关联映射方式（本工程核心内容）
+----------------------------------------------------------------
+方式          类/方法                    原理                查询次数
+----------------------------------------------------------------
+单步一对一    AccountDao.findAll()       一条SQL join，      1次
+                                         MyBatis 自动拆嵌套
+分步一对一    AccountDao
+              .findAllCashCade()        主查 account，      N+1次
+                                         再按 auserid 查user
+分步一对多    UserDao.findAllUser()      主查 user，        N+1次
+                                         再按 userid 查account
+
+单步 vs 分步的取舍：
+    单步    一次SQL 拿全部数据，MyBatis 帮你把扁平行拆成嵌套对象。
+            结果集很宽、表很大时会变慢；只适用于一对一。
+    分步    主查询 + 每个对象各发一次子查询（N+1）。
+            支持延迟加载；一对多只能用这种。
+
+
+EmpDao 的两个知识点
+----------------------------------------------------------------
+1. 自增主键回填
+   @Options(useGeneratedKeys = true, keyProperty = "eid")
+   saveEmp 与 saveEmpBackOne 的 SQL 完全相同，唯一差别是这个注解。
+   插入后直接 emp.getEid() 拿主键，不用再 select max(id)。
+
+2. 动态 SQL（findSql + EmpSql）
+   @SelectProvider(type = EmpSql.class, method = "findSql")
+   EmpSql 里用 where 1 = 1 让后面永远能直接拼 and。
+   ⚠️ where 1 = 1 会让MySQL 无法使用索引、强制全表扫描。
+      生产环境要用 XML 的 <where> 标签（会自动吃掉多余的 and）。
+      正确写法见 springboot_data_mybatis_04 的 EmpMapper.xml。
+
+
+需要注意的坑
+----------------------------------------------------------------
+· @One/@Many 里的值是「全限定类名+方法名」的字符串，MyBatis 拿它去
+  Configuration 里查已注册的 statement。改包名或方法名 → 编译通过
+  但运行时抛 BindingException: Invalid bound statement。
+· 同类型内部方法调用不走 Spring 代理，@Transactional 不生效（AOP 限制）。
+· AccountDao 原本漏写 @Mapper，会导致 UserDao.findAllUser() 里的
+  @Many 引用找不到 statement。现已补上。
+· MyBatis 注解方式里，@Insert/@Update/@Delete 只写一条语句，没法像XML
+  那样写 <set> 批量赋值。要动态改字段只能拆成多个方法或改用 XML。
+· MySQL 行注释「--」后面必须有空格，否则报 1064 语法错误。

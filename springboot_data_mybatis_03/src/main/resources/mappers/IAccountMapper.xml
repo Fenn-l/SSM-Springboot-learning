@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ape.springboot_data_mybatis_03.mapper.IAccountMapper">
+
+    <!-- resultMap -->
+    <resultMap id="map1" type="com.ape.springboot_data_mybatis_03.pojo.Account">
+        <id property="aid" column="aid"></id>
+        <result property="auserid" column="auserid"></result>
+        <result property="amoney" column="amoney"></result>
+        <!-- 一对一的关系映射：配置封装user的内容
+        <association property="需要映射到的属性名" column="传递的字段"
+            javaType="需要映射到的属性的属性类型"
+            select="需要调用的方法位置" />
+        -->
+        <association column="auserid" select="com.ape.springboot_data_mybatis_03.mapper.IUserMapper.findUserByUid"  property="user"  javaType="com.ape.springboot_data_mybatis_03.pojo.User">
+        </association>
+    </resultMap>
+
+    <!--s
+    按照账户ID查询账户以及用户数据
+    public Account findAccountByAid(int aid); -->
+    <select id="findAccountByAid" resultMap="map1" parameterType="int">
+        select * from account where aid = #{id}
+    </select>
+    <!--一对多
+    public List<Account> findAccountByUser(int userId);
+    -->
+    <select id="findAccountByUser" resultType="com.ape.springboot_data_mybatis_03.pojo.Account" parameterType="int">
+        select * from account where auserid = #{userid}
+    </select>
+
+
+</mapper>

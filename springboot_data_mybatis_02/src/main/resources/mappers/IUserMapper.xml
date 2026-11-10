@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ape.springboot_data_mybatis_02.mapper.IUserMapper">
+    <resultMap id="map2" type="com.ape.springboot_data_mybatis_02.pojo.User">
+        <id property="userid" column="userid"></id>
+        <result property="username" column="username"></result>
+        <result property="useraddress" column="useraddress"></result>
+        <result property="usersex" column="usersex"></result>
+        <result property="userbirthday" column="userbirthday"></result>
+
+        <!-- 配置user对象中accounts集合的映射 -->
+        <collection property="accounts" ofType="com.ape.springboot_data_mybatis_02.pojo.Account">
+            <id column="aid" property="aid"></id>
+            <result column="auserid" property="auserid"></result>
+            <result column="amoney" property="amoney"></result>
+        </collection>
+
+    </resultMap>
+
+    <!--  查询一个用户，同时获取到用户下所有账户的信息
+         User findUserByUid(int uid) -->
+    <select id="findUserByUid" resultMap="map2" parameterType="int">
+        select a.*,u.*
+        from account as a,user as u
+        where a.auserid = u.userid and u.userid = #{id}
+    </select>
+</mapper>

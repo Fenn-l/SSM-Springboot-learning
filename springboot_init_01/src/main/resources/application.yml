@@ -1,0 +1,19 @@
+server:
+  port: 8081
+
+dname: 咪咪
+dage: 10
+
+person1:
+  name: wangls
+  age: 18
+  marry: true
+  birth: 1990/10/19
+  maps: {k1: v1,k2: v2}
+  lists:
+    - code
+    - bodybuilding
+    - music
+  dog:
+    name: summer
+    age: 1

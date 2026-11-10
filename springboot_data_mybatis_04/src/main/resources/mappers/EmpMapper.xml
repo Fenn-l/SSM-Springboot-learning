@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ape.springboot_data_mybatis_04.mapper.EmpMapper">
+    <!-- if动态sql的使用
+    语法：
+    if  test="条件"
+
+    choose动态sql的使用
+    语法：省略
+    注意点：1.可以编写多个when与java中的switch相似
+           2.但凡进入任意一个when其余将不再执行
+           3.若所有when都未匹配到则执行otherwise
+    -->
+
+    <!-- 方法1 -->
+    <select id="findOne" parameterType="Emp" resultType="Emp">
+        select * from emp
+        <if test = "ename != null ">
+            where ename = #{ename};
+        </if>
+    </select>
+
+    <!-- 方法2 -->
+    <select id="findTwo" parameterType="Emp" resultType="Emp">
+        select * from emp where 1 = 1
+        <if test="ename != null">
+            and ename = #{ename}
+        </if>
+        <if test="egender != null">
+            and egender = #{egender}
+        </if>
+    </select>
+
+    <!-- 方法3 -->
+    <select id="findChoose" parameterType="Emp" resultType="Emp">
+        select * from emp where 1 = 1
+        <choose>
+            <when test="ename != null">
+                and ename = #{ename}
+            </when>
+            <when test="egender != null">
+                and egender = #{egender}
+            </when>
+            <otherwise>
+                and esalary > 9000
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!-- 方法4
+     where：替代sql语句中的where关键字
+     特点:1.若有条件则生成where关键字
+         2.若无条件则不生成where关键字
+         3.where会自动屏蔽掉多余的and与or关键字
+     -->
+    <select id="findWhere" parameterType="Emp" resultType="Emp">
+        select * from emp
+
+        <where>
+            <if test="ename != null">
+                ename = #{ename}
+            </if>
+            <if test="egender != null">
+                and egender = #{egender}
+            </if>
+        </where>
+    </select>
+
+
+    <!-- 方法5
+     set：替代sql语句中的set关键字
+     特点:1.set会自动去掉末尾的“，”
+     -->
+    <update id="updateSet" parameterType="Emp" >
+        update emp
+        <set>
+            <if test="ename != null">
+                ename = #{ename},
+            </if>
+            <if test="egender != null">
+                egender = #{egender}
+            </if>
+        </set>
+        where eid = #{eid};
+    </update>
+
+
+    <!-- 方法6
+    trim：可以完成where与set的功能
+    语法：<trim   prefix = “关键字” suffixOverrides = “后缀” prefixOverrides=“前缀”></trim>
+    注意点：
+    1.prefix，suffix会根据sql语句智能的添加前缀或后缀
+    2.prefixOverrides，suffixOverrides会智能的帮出去除多余的“and  or  ,”
+    -->
+    <select id="TrimOne" parameterType="Emp" resultType="Emp">
+        select * from emp
+        <trim prefix="where" prefixOverrides="and">
+            <if test="ename != null">
+                and ename = #{ename}
+            </if>
+            <if test="egender != null">
+                and egender = #{egender}
+            </if>
+
+        </trim>
+    </select>
+
+
+    <!-- 方法7-->
+    <update id="TrimTwo" parameterType="Emp" >
+        update emp
+        <trim prefix="set" suffixOverrides=",">
+            <if test="ename != null">
+                ename = #{ename},
+            </if>
+            <if test="egender != null">
+                egender = #{egender},
+            </if>
+        </trim>
+        where eid = #{eid};
+    </update>
+
+    <!-- 方法8
+    collection：list array表示遍历集合或者数组
+    item:创建变量用来保存每次遍历的数据
+    open：开始时候拼接的元素，只执行一次
+    close：结束的候拼接的元素，只执行一次
+    separator：每个元素的分隔符号，每次循环完执行；
+    index:下标
+     -->
+    <select id="findByArray" parameterType="int[]" resultType="Emp">
+        select * from emp where esalary in
+        <foreach collection="array" item="num" open="(" separator=","
+                 close=")">
+            #{num}
+        </foreach>
+    </select>
+
+    <!-- 方法9 -->
+    <select id="findByList" parameterType="list" resultType="Emp">
+        select * from emp where esalary in
+        <foreach collection="list" item="a" open="(" separator=","
+                 close=")">
+            #{a}
+        </foreach>
+    </select>
+
+
+
+
+
+</mapper>

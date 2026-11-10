@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ape.springboot_data_mybatis_01.mapper.StudentMapper">
+
+    <!--    public List<Student> findAll();-->
+    <select id="findAll" resultType="com.ape.springboot_data_mybatis_01.pojo.Student">
+        select * from student1;
+    </select>
+    <select id="findByName" resultType="com.ape.springboot_data_mybatis_01.pojo.Student" parameterType="java.lang.String">
+        select * from student1 where stuName=#{name};
+    </select>
+    <select id="findById" resultType="com.ape.springboot_data_mybatis_01.pojo.Student" parameterType="int">
+        select * from student1 where stuId=#{id};
+    </select>
+
+    <!--多参数传递方式1：map,按照姓名与爱好查询
+    语法：#{map集合.key}====省略写法#{key}
+    parameterType="java.util.Map"因为参数已经制定了map类型所有不需要编写#{maps.key}直接编写#{key}
+    -->
+    <select id="findByMessage1" resultType="com.ape.springboot_data_mybatis_01.pojo.Student" parameterType="java.util.Map">
+        select * from student1 where stuName=#{name} and stuSex=#{sex};
+    </select>
+
+    <select id="findByMessage2" resultType="com.ape.springboot_data_mybatis_01.pojo.Student" parameterType="com.ape.springboot_data_mybatis_01.pojo.QueryParam">
+        select * from student1 limit #{page},#{rows};
+    </select>
+    <!--聚合查询-->
+    <select id="findCount" resultType="java.lang.Integer" >
+        select count(*) from student1;
+    </select>
+
+
+    <!--模糊查询-->
+    <select id="findLikeNameOne" resultType="com.ape.springboot_data_mybatis_01.pojo.Student" parameterType="java.lang.String" >
+        select * from student1 where stuName like #{name};
+    </select>
+
+    <!--模糊查询-->
+    <select id="findLikeNameTwo" resultType="com.ape.springboot_data_mybatis_01.pojo.Student" parameterType="java.lang.String" >
+        select * from student1 where stuName like concat(#{name},'%');
+    </select>
+
+    <!--
+    resultType:表示简单结果集类型(“自动生成映射规则”按照属性名与字段名一一对应)
+    场景:
+      javaBean                table
+      student                 student
+      stuId                   stuId
+      stuName                 stuName
+      ....                    ....
+
+
+
+    resultMap:表示复杂结果集类型(“手动编写映射规则”属性名与字段名指定一一对应)
+    场景:
+      javaBean                table
+      student                 student
+      stuId                   stu_id
+      stuName                 stu_name
+      ....                    ....
+    -->
+
+    <!--查询所有
+    select * from student;
+    -->
+    <!--方式1-->
+    <!--    <select id="findAllOne" resultType="com.ape.springboot_data_mybatis_01.pojo.Student">-->
+    <!--      select stu_id as stuId,stu_name as stuName,stu_sex as stuSex,stu_hobby as stuHobby from student-->
+    <!--    </select>-->
+    <!--方式2：开启配置 自动驼峰映射，stuId  自动 映射给  stu_Id
+    mybatis:
+        configuration:
+            map-underscore-to-camel-case: true
+    -->
+    <!--    <select id="findAllOne" resultType="com.ape.springboot_data_mybatis_01.pojo.Student">-->
+    <!--      select * from student-->
+    <!--    </select>-->
+
+    <!--方式3：手写映射规则 通过   resultMap属性定义
+        id=""属性======》resultMap标识符
+        type=""属性====》当前配置的javaBean类型
+        resultMap注意:
+        1.可以重复使用
+        2.定义在使用的上方
+        3.可以继承
+
+        <id></id>标签==========》配置主键映射
+        <result></result>标签==》配置非主键映射
+                property=""javaBean的属性名 column="" table表的字段名
+    -->
+    <resultMap id="map" type="com.ape.springboot_data_mybatis_01.pojo.Student">
+        <id column="stu_id" property="stuId"></id>
+        <result column="stu_name" property="stuName"></result>
+        <result column="stu_sex" property="stuSex"></result>
+        <result column="stu_hobby" property="stuHobby"></result>
+    </resultMap>
+
+    <select id="findAllOne" resultMap="map">
+        select * from student1
+    </select>
+
+    <!--新增方法-->
+    <insert id="insertStudent" parameterType="com.ape.springboot_data_mybatis_01.pojo.Student">
+        insert into student1(stu_name,stu_sex,stu_hobby) value(#{stuName},#{stuSex},#{stuHobby});
+    </insert>
+
+
+    <!--新增方法(主键回填)-->
+    <insert id="insertStudentGeneratedOne" parameterType="com.ape.springboot_data_mybatis_01.pojo.Student" useGeneratedKeys="true" keyProperty="stuId">
+        insert into student1(stu_name,stu_sex,stu_hobby) values(#{stuName},#{stuSex},#{stuHobby});
+    </insert>
+
+
+
+    <!--修改-->
+    <update id="updateById" parameterType="com.ape.springboot_data_mybatis_01.pojo.Student">
+        update student1 set stu_name=#{stuName},stu_sex=#{stuSex},stu_hobby=#{stuHobby} where stu_id = #{stuId};
+    </update>
+
+    <!--删除-->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from student1 where stu_id = #{id};
+    </delete>
+
+</mapper>
